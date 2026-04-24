@@ -1,12 +1,12 @@
 import { Slot } from "expo-router";
-import { useEffect } from "react";
-
-import { initDB } from "../database/sql";
+import { useLayoutEffect } from "react";
+import { initDB, seedStickers } from "../database/sql";
 
 export default function RootLayout() {
-	useEffect(() => {
-		initDB();
-	}, []);
+    useLayoutEffect(() => {
+        initDB();
+        seedStickers();
+    }, []);
 
-	return <Slot />;
+    return <Slot />;
 }
