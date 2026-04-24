@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { BarChart3, Copy } from "lucide-react-native";
+import { BarChart3, Copy, Plus } from "lucide-react-native";
 import { Grid2x2, Search } from "lucide-react-native/icons";
 import { StyleSheet, View } from "react-native";
 
@@ -34,7 +34,7 @@ export default function TabsLayout() {
                     name="adicionar"
                     options={{
                         title: "Adicionar",
-                        tabBarIcon: ({ color, size }) => <Search size={size} color={color} />
+                        tabBarIcon: ({ color, size }) => <Plus size={size} color={color} />
                     }}
                 />
 
