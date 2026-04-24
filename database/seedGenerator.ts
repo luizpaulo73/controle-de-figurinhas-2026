@@ -2,13 +2,13 @@ import { groups } from "./albumStructure/groups";
 
 type StickerSeed = {
     code: string;
-    group_type: "INTRO" | "TEAM" | "FWC" | "COCA";
+    group_type: "INTRO" | "HOST" | "TEAM" | "FWC" | "COCA";
     team_code: string | null;
     group: string | null;
     number: number;
 };
 
-export function generateStickerSeeds(): StickerSeed[] {
+export function generateStickerSeed(): StickerSeed[] {
     const stickers: StickerSeed[] = [];
 
     // panini 00 sticker
@@ -21,10 +21,21 @@ export function generateStickerSeeds(): StickerSeed[] {
     });
 
     // panini FWC stickers (initial page)
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 4; i++) {
         stickers.push({
             code: `FWC${i}`,
             group_type: "INTRO",
+            team_code: null,
+            group: null,
+            number: i,
+        });
+    }
+
+    // host country and ball stickers (4 stickers)
+    for (let i = 5; i <= 8; i++) {
+        stickers.push({
+            code: `FWC${i}`,
+            group_type: "HOST",
             team_code: null,
             group: null,
             number: i,
