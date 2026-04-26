@@ -1,3 +1,10 @@
+import { Text, View } from "react-native";
+
 export default function AlbumPage() {
-    return null;
+
+    return (
+        <View>
+            <Text>Em breve... (album)</Text>
+        </View>
+    );
 }

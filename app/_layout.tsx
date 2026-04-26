@@ -1,4 +1,4 @@
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import { useLayoutEffect } from "react";
 import { initDB, seedStickers } from "../database/sql";
 
@@ -8,5 +8,9 @@ export default function RootLayout() {
         seedStickers();
     }, []);
 
-    return <Slot />;
+    return (
+        <Stack initialRouteName="(tabs)">
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+    );
 }

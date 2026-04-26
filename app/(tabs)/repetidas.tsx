@@ -1,3 +1,9 @@
+import { View, Text } from "react-native";
+
 export default function RepeatedStickerPage() {
-    return null;
+    return (
+            <View>
+                <Text>Em breve... (repetidas)</Text>
+            </View>
+        );
 }

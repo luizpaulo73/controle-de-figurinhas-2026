@@ -1,12 +1,12 @@
 import { Tabs } from "expo-router";
-import { BarChart3, Copy, Plus } from "lucide-react-native";
-import { Grid2x2, Search } from "lucide-react-native/icons";
+import { Grid2x2, Search, BarChart3, Copy, Plus } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 export default function TabsLayout() {
     return (
         <View style={styles.container}>
             <Tabs
+                initialRouteName="album"
                 screenOptions={{
                     headerShown: false,
                     tabBarStyle: styles.tabBar,
@@ -15,6 +15,7 @@ export default function TabsLayout() {
                 }}
             >
                 <Tabs.Screen
+                    key="album"
                     name="album"
                     options={{
                         title: "Álbum",
@@ -23,6 +24,7 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
+                    key="faltantes"
                     name="faltantes"
                     options={{
                         title: "Faltantes",
@@ -31,6 +33,7 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
+                    key="adicionar"
                     name="adicionar"
                     options={{
                         title: "Adicionar",
@@ -39,6 +42,7 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
+                    key="repetidas"
                     name="repetidas"
                     options={{
                         title: "Repetidas",
@@ -47,6 +51,7 @@ export default function TabsLayout() {
                 />
 
                 <Tabs.Screen
+                    key="progresso"
                     name="progresso"
                     options={{
                         title: "Progresso",
