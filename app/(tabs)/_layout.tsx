@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Grid2x2, Search, BarChart3, Copy, Plus } from "lucide-react-native";
+import { Grid2x2, Search, BarChart3, Plus } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 
 export default function TabsLayout() {
@@ -36,17 +36,8 @@ export default function TabsLayout() {
                     key="adicionar"
                     name="adicionar"
                     options={{
-                        title: "Adicionar",
+                        title: "Adicionar/Remover",
                         tabBarIcon: ({ color, size }) => <Plus size={size} color={color} />
-                    }}
-                />
-
-                <Tabs.Screen
-                    key="repetidas"
-                    name="repetidas"
-                    options={{
-                        title: "Repetidas",
-                        tabBarIcon: ({ color, size }) => <Copy size={size} color={color} />
                     }}
                 />
 

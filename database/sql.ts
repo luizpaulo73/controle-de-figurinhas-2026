@@ -49,10 +49,6 @@ export function seedStickers() {
     });
 }
 
-export function markAsOwned(code: string) {
-    db.runSync(`UPDATE stickers SET owned = 1 WHERE code = ?`, [code]);
-}
-
 export function addSticker(code: string) {
     db.runSync(`UPDATE stickers SET owned = owned + 1 WHERE code = ?`, [code]);
 }
