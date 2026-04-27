@@ -6,13 +6,9 @@ import { getAlbumTeamSections } from "../../database/sql";
 import { AlbumTeamSection } from "../../types/sqlAlbum";
 
 export default function AlbumPage() {
-    const [sections, setSections] = useState<AlbumTeamSection[]>(() =>
-        getAlbumTeamSections(),
-    );
+    const [sections, setSections] = useState<AlbumTeamSection[]>(() => getAlbumTeamSections());
 
-    const loadAlbumSections = useCallback(() => {
-        setSections(getAlbumTeamSections());
-    }, []);
+    const loadAlbumSections = useCallback(() => { setSections(getAlbumTeamSections()) }, []);
 
     useFocusEffect(
         useCallback(() => {

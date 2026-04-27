@@ -1,9 +1,30 @@
 import { AlbumTeamSection, TeamStickerRow } from "../types/sqlAlbum";
+import { teamCountryMeta } from "./albumStructure/countries";
 import { db } from "./db";
 import { generateStickerSeed } from "./seedGenerator";
 
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let initialized = false;
+
+type TableInfoRow = {
+    name: string;
+};
+
+function getStickersColumnNames() {
+    const columns = db.getAllSync<TableInfoRow>("PRAGMA table_info(stickers);");
+    return new Set(columns.map((column) => column.name));
+}
+
+function syncTeamCountryMetadata() {
+    Object.entries(teamCountryMeta).forEach(([teamCode, countryMeta]) => {
+        db.runSync(
+            `UPDATE stickers
+             SET country_name = ?, country_rgb = ?, flag_emoji = ?
+             WHERE team_code = ?`,
+            [countryMeta.name, countryMeta.rgb, countryMeta.flagEmoji, teamCode]
+        );
+    });
+}
 
 export function initDB() {
     if (initialized) {
@@ -22,11 +43,31 @@ export function initDB() {
                 team_code TEXT,
                 group_name TEXT,
                 number INTEGER,
+                country_name TEXT,
+                country_rgb TEXT,
+                flag_emoji TEXT,
                 owned INTEGER DEFAULT 0
             );
         `);
 
         db.execSync(`CREATE UNIQUE INDEX IF NOT EXISTS idx_stickers_code ON stickers(code);`);
+    }
+
+    if (currentVersion < 2) {
+        const columnNames = getStickersColumnNames();
+
+        if (!columnNames.has("country_name")) {
+            db.execSync("ALTER TABLE stickers ADD COLUMN country_name TEXT;");
+        }
+
+        if (!columnNames.has("country_rgb")) {
+            db.execSync("ALTER TABLE stickers ADD COLUMN country_rgb TEXT;");
+        }
+
+        if (!columnNames.has("flag_emoji")) {
+            db.execSync("ALTER TABLE stickers ADD COLUMN flag_emoji TEXT;");
+        }
+
         db.execSync(`PRAGMA user_version = ${DB_VERSION};`);
     }
 
@@ -37,17 +78,37 @@ export function seedStickers() {
     const row = db.getFirstSync<{ count: number }>("SELECT COUNT(*) as count FROM stickers");
 
     const count = row?.count ?? 0;
-    if (count > 0) return;
+    if (count === 0) {
+        const data = generateStickerSeed();
 
-    const data = generateStickerSeed();
+        data.forEach((s) => {
+            db.runSync(
+                `INSERT INTO stickers (
+                    code,
+                    group_type,
+                    team_code,
+                    group_name,
+                    number,
+                    country_name,
+                    country_rgb,
+                    flag_emoji
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    s.code,
+                    s.group_type,
+                    s.team_code,
+                    s.group,
+                    s.number,
+                    s.country_name,
+                    s.country_rgb,
+                    s.flag_emoji,
+                ]
+            );
+        });
+    }
 
-    data.forEach((s) => {
-        db.runSync(
-            `INSERT INTO stickers (code, group_type, team_code, group_name, number)
-            VALUES (?, ?, ?, ?, ?)`,
-            [s.code, s.group_type, s.team_code, s.group, s.number]
-        );
-    });
+    syncTeamCountryMetadata();
 }
 
 export function addSticker(code: string) {
@@ -75,7 +136,7 @@ export function getAlbumTeamSections(): AlbumTeamSection[] {
     seedStickers();
 
     const rows = db.getAllSync<TeamStickerRow>(
-        `SELECT id, code, team_code, group_name, number, owned
+        `SELECT id, code, team_code, group_name, number, country_name, country_rgb, flag_emoji, owned
          FROM stickers
          WHERE group_type = 'TEAM'
          ORDER BY id ASC`
@@ -89,6 +150,7 @@ export function getAlbumTeamSections(): AlbumTeamSection[] {
         }
 
         const teamCode = row.team_code;
+        const fallbackCountryMeta = teamCountryMeta[teamCode];
         const existingSection = sectionsByTeam.get(teamCode);
 
         if (existingSection) {
@@ -104,6 +166,9 @@ export function getAlbumTeamSections(): AlbumTeamSection[] {
         sectionsByTeam.set(teamCode, {
             id: teamCode,
             teamCode,
+            countryName: row.country_name ?? fallbackCountryMeta?.name ?? teamCode,
+            countryRgb: row.country_rgb ?? fallbackCountryMeta?.rgb ?? "rgb(10, 46, 111)",
+            flagEmoji: row.flag_emoji ?? fallbackCountryMeta?.flagEmoji ?? "🏳️",
             groupName: row.group_name,
             stickers: [
                 {
