@@ -22,7 +22,7 @@ export default function StickerSection({ teamCode, countryName, countryRgb, flag
 
     return (
         <View style={styles.wrapper}>
-            <View style={[styles.header, { backgroundColor: countryRgb }]}>
+            <View style={[styles.header, { borderBottomColor: countryRgb, borderLeftColor: countryRgb }]}>
                 <View style={styles.countryBlock}>
                     <Text style={styles.flagEmoji}>{flagEmoji}</Text>
 
@@ -80,6 +80,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         paddingHorizontal: 14,
         paddingVertical: 8,
+        borderBottomWidth: 4,
+        borderLeftWidth: 2,
+        borderRadius: 12,
     },
     countryBlock: {
         flexDirection: "row",
