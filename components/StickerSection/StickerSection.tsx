@@ -8,24 +8,32 @@ export type StickerSectionItem = {
 
 type StickerSectionProps = {
     teamCode: string;
+    countryName: string;
+    countryRgb: string;
+    flagEmoji: string;
     groupName: string;
     stickers: StickerSectionItem[];
 };
 
-export default function StickerSection({ teamCode, groupName, stickers }: StickerSectionProps) {
+export default function StickerSection({ teamCode, countryName, countryRgb, flagEmoji, groupName, stickers }: StickerSectionProps) {
     const totalStickers = stickers.length;
     const collectedCount = stickers.filter((item) => item.owned > 0).length;
     const progress = totalStickers > 0 ? (collectedCount / totalStickers) * 100 : 0;
 
     return (
         <View style={styles.wrapper}>
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: countryRgb }]}>
                 <View style={styles.countryBlock}>
-                    <Text style={styles.countryCode}>{teamCode}</Text>
-                    <Text style={styles.countryName}>Grupo {groupName}</Text>
+                    <Text style={styles.flagEmoji}>{flagEmoji}</Text>
+
+                    <View>
+                        <Text style={styles.countryCode}>{teamCode}</Text>
+                        <Text style={styles.countryName}>{countryName}</Text>
+                    </View>
                 </View>
 
                 <View style={styles.progressBlock}>
+                    <Text style={styles.groupText}>Grupo {groupName}</Text>
                     <Text style={styles.progressText}>
                         {collectedCount}/{totalStickers}
                     </Text>
@@ -67,7 +75,6 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     header: {
-        backgroundColor: "#0A2E6F",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -78,33 +85,42 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
     },
+    flagEmoji: {
+        fontSize: 20,
+        marginRight: 8,
+    },
     countryCode: {
         color: "#FFFFFF",
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "900",
         letterSpacing: 0.4,
-        marginRight: 10,
     },
     countryName: {
         color: "#DDE6FA",
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: "600",
     },
     progressBlock: {
         alignItems: "flex-end",
     },
+    groupText: {
+        color: "#EAF2FF",
+        fontSize: 11,
+        fontWeight: "700",
+        lineHeight: 14,
+    },
     progressText: {
         color: "#FFFFFF",
         fontSize: 14,
         fontWeight: "900",
-        lineHeight: 20,
+        lineHeight: 18,
     },
     progressTrack: {
         marginTop: 4,
         width: 86,
         height: 8,
         borderRadius: 999,
-        backgroundColor: "#3B5A8F",
+        backgroundColor: "rgba(255, 255, 255, 0.25)",
         overflow: "hidden",
     },
     progressFill: {
