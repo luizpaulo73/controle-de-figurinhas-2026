@@ -15,6 +15,7 @@ type StickerSectionProps = {
     flagEmoji: string;
     groupName: string;
     stickers: StickerSectionItem[];
+    hideCollectedStickers: boolean;
     onAddSticker: (code: string) => void;
     onRemoveSticker: (code: string) => void;
 };
@@ -26,6 +27,7 @@ export default function StickerSection({
     flagEmoji,
     groupName,
     stickers,
+    hideCollectedStickers,
     onAddSticker,
     onRemoveSticker,
 }: StickerSectionProps) {
@@ -64,6 +66,9 @@ export default function StickerSection({
     const totalStickers = stickers.length;
     const collectedCount = stickers.filter((item) => item.owned > 0).length;
     const progress = totalStickers > 0 ? (collectedCount / totalStickers) * 100 : 0;
+    const visibleStickers = hideCollectedStickers
+        ? stickers.filter((item) => item.owned === 0)
+        : stickers;
 
     return (
         <View style={styles.wrapper}>
@@ -98,7 +103,7 @@ export default function StickerSection({
 
             {!isCollapsed && (
                 <View style={styles.gridContent}>
-                    {stickers.map((item) => {
+                    {visibleStickers.map((item) => {
                         const isCollected = item.owned > 0;
 
                         return (

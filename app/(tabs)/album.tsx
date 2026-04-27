@@ -1,19 +1,16 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StickerSection from "../../components/StickerSection/StickerSection";
-import {
-    addSticker,
-    getAlbumTeamSections,
-    removeSticker,
-} from "../../database/sql";
+import { addSticker, getAlbumTeamSections, removeSticker } from "../../database/sql";
 import { AlbumTeamSection } from "../../types/sqlAlbum";
 
 export default function AlbumPage() {
     const [sections, setSections] = useState<AlbumTeamSection[]>(() =>
         getAlbumTeamSections(),
     );
+    const [hideCollectedStickers, setHideCollectedStickers] = useState<boolean>(false);
 
     const loadAlbumSections = useCallback(() => {
         setSections(getAlbumTeamSections());
@@ -58,6 +55,23 @@ export default function AlbumPage() {
                     </View>
                 </View>
 
+                <Pressable
+                    accessibilityRole="switch"
+                    accessibilityState={{ checked: hideCollectedStickers }}
+                    accessibilityLabel="Ocultar figurinhas que ja estao marcadas"
+                    onPress={() => setHideCollectedStickers((prev) => !prev)}
+                    style={[
+                        styles.filterToggle,
+                        hideCollectedStickers && styles.filterToggleActive,
+                    ]}
+                >
+                    <Text style={styles.filterToggleText}>
+                        {hideCollectedStickers
+                            ? "Mostrando apenas faltantes"
+                            : "Mostrar todas as figurinhas"}
+                    </Text>
+                </Pressable>
+
                 <FlatList
                     data={sections}
                     keyExtractor={(item) => item.id}
@@ -72,6 +86,7 @@ export default function AlbumPage() {
                                 flagEmoji={item.flagEmoji}
                                 groupName={item.groupName}
                                 stickers={item.stickers}
+                                hideCollectedStickers={hideCollectedStickers}
                                 onAddSticker={handleAddSticker}
                                 onRemoveSticker={handleRemoveSticker}
                             />
@@ -133,6 +148,25 @@ const styles = StyleSheet.create({
     listContent: {
         paddingTop: 2,
         paddingBottom: 24,
+    },
+    filterToggle: {
+        borderWidth: 1,
+        borderColor: "#65645F",
+        backgroundColor: "#30302E",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        marginBottom: 10,
+    },
+    filterToggleActive: {
+        borderColor: "#C9A85B",
+        backgroundColor: "#3A372D",
+    },
+    filterToggleText: {
+        color: "#FFFFFF",
+        fontSize: 13,
+        fontWeight: "700",
+        textAlign: "center",
     },
     sectionItem: {
         marginBottom: 12,
