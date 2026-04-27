@@ -4,6 +4,9 @@ export type TeamStickerRow = {
     team_code: string | null;
     group_name: string | null;
     number: number;
+    country_name: string | null;
+    country_rgb: string | null;
+    flag_emoji: string | null;
     owned: number | null;
 };
 
@@ -17,6 +20,9 @@ export type AlbumSticker = {
 export type AlbumTeamSection = {
     id: string;
     teamCode: string;
+    countryName: string;
+    countryRgb: string;
+    flagEmoji: string;
     groupName: string;
     stickers: AlbumSticker[];
 };
