@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     progressFill: {
         height: "100%",
         borderRadius: 999,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#C9A85B",
     },
     gridContent: {
         flexDirection: "row",
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
         letterSpacing: 0.2,
     },
     stickerTextMissing: {
-        color: "#6D7480",
+        color: "#000000",
     },
     check: {
         position: "absolute",
