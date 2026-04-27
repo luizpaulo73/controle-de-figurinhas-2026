@@ -55,22 +55,45 @@ export default function AlbumPage() {
                     </View>
                 </View>
 
-                <Pressable
-                    accessibilityRole="switch"
-                    accessibilityState={{ checked: hideCollectedStickers }}
-                    accessibilityLabel="Ocultar figurinhas que ja estao marcadas"
-                    onPress={() => setHideCollectedStickers((prev) => !prev)}
-                    style={[
-                        styles.filterToggle,
-                        hideCollectedStickers && styles.filterToggleActive,
-                    ]}
-                >
-                    <Text style={styles.filterToggleText}>
-                        {hideCollectedStickers
-                            ? "Mostrando apenas faltantes"
-                            : "Mostrar todas as figurinhas"}
-                    </Text>
-                </Pressable>
+                <View style={styles.filterSegment}>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Mostrar todas as figurinhas"
+                        onPress={() => setHideCollectedStickers(false)}
+                        style={[
+                            styles.filterSegmentButton,
+                            !hideCollectedStickers && styles.filterSegmentButtonActive,
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                styles.filterSegmentButtonText,
+                                !hideCollectedStickers && styles.filterSegmentButtonTextActive,
+                            ]}
+                        >
+                            Todas
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Mostrar somente figurinhas faltantes"
+                        onPress={() => setHideCollectedStickers(true)}
+                        style={[
+                            styles.filterSegmentButton,
+                            hideCollectedStickers && styles.filterSegmentButtonActive,
+                        ]}
+                    >
+                        <Text
+                            style={[
+                                styles.filterSegmentButtonText,
+                                hideCollectedStickers && styles.filterSegmentButtonTextActive,
+                            ]}
+                        >
+                            Faltantes
+                        </Text>
+                    </Pressable>
+                </View>
 
                 <FlatList
                     data={sections}
@@ -149,24 +172,37 @@ const styles = StyleSheet.create({
         paddingTop: 2,
         paddingBottom: 24,
     },
-    filterToggle: {
+    filterSegment: {
         borderWidth: 1,
         borderColor: "#65645F",
         backgroundColor: "#30302E",
         borderRadius: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 12,
+        padding: 4,
         marginBottom: 10,
+        flexDirection: "row",
+        gap: 6,
     },
-    filterToggleActive: {
-        borderColor: "#C9A85B",
+    filterSegmentButton: {
+        flex: 1,
+        borderRadius: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "transparent",
+    },
+    filterSegmentButtonActive: {
         backgroundColor: "#3A372D",
+        borderWidth: 1,
+        borderColor: "#C9A85B",
     },
-    filterToggleText: {
-        color: "#FFFFFF",
+    filterSegmentButtonText: {
+        color: "#D7D4CA",
         fontSize: 13,
         fontWeight: "700",
-        textAlign: "center",
+    },
+    filterSegmentButtonTextActive: {
+        color: "#FFFFFF",
     },
     sectionItem: {
         marginBottom: 12,
