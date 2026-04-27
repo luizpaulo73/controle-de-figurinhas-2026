@@ -25,7 +25,7 @@ export const teamCountryMeta: Record<string, TeamCountryMeta> = {
     CUW: { name: "Curacao", rgb: "rgb(0, 80, 157)", flagEmoji: "🇨🇼" },
     CIV: { name: "Costa do Marfim", rgb: "rgb(209, 108, 0)", flagEmoji: "🇨🇮" },
     ECU: { name: "Equador", rgb: "rgb(0, 57, 166)", flagEmoji: "🇪🇨" },
-    NED: { name: "Paises Baixos", rgb: "rgb(174, 28, 40)", flagEmoji: "🇳🇱" },
+    NED: { name: "Paises Baixos", rgb: "rgb(243, 108, 33)", flagEmoji: "🇳🇱" },
     JPN: { name: "Japao", rgb: "rgb(188, 0, 45)", flagEmoji: "🇯🇵" },
     SWE: { name: "Suecia", rgb: "rgb(0, 82, 147)", flagEmoji: "🇸🇪" },
     TUN: { name: "Tunisia", rgb: "rgb(210, 16, 52)", flagEmoji: "🇹🇳" },
