@@ -2,13 +2,37 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import StickerSection from "../../components/StickerSection/StickerSection";
-import { getAlbumTeamSections } from "../../database/sql";
+import {
+    addSticker,
+    getAlbumTeamSections,
+    removeSticker,
+} from "../../database/sql";
 import { AlbumTeamSection } from "../../types/sqlAlbum";
 
 export default function AlbumPage() {
-    const [sections, setSections] = useState<AlbumTeamSection[]>(() => getAlbumTeamSections());
+    const [sections, setSections] = useState<AlbumTeamSection[]>(() =>
+        getAlbumTeamSections(),
+    );
 
-    const loadAlbumSections = useCallback(() => { setSections(getAlbumTeamSections()) }, []);
+    const loadAlbumSections = useCallback(() => {
+        setSections(getAlbumTeamSections());
+    }, []);
+
+    const handleAddSticker = useCallback(
+        (code: string) => {
+            addSticker(code);
+            loadAlbumSections();
+        },
+        [loadAlbumSections],
+    );
+
+    const handleRemoveSticker = useCallback(
+        (code: string) => {
+            removeSticker(code);
+            loadAlbumSections();
+        },
+        [loadAlbumSections],
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -32,6 +56,8 @@ export default function AlbumPage() {
                             flagEmoji={item.flagEmoji}
                             groupName={item.groupName}
                             stickers={item.stickers}
+                            onAddSticker={handleAddSticker}
+                            onRemoveSticker={handleRemoveSticker}
                         />
                     </View>
                 )}

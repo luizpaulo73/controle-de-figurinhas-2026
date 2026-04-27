@@ -130,19 +130,11 @@ export function seedStickers() {
 }
 
 export function addSticker(code: string) {
-    db.runSync(`UPDATE stickers SET owned = owned + 1 WHERE code = ?`, [code]);
+    db.runSync(`UPDATE stickers SET owned = 1 WHERE code = ?`, [code]);
 }
 
 export function removeSticker(code: string) {
-    db.runSync(
-        `UPDATE stickers 
-         SET owned = CASE 
-            WHEN owned > 0 THEN owned - 1 
-            ELSE 0 
-         END
-         WHERE code = ?`,
-        [code],
-    );
+    db.runSync(`UPDATE stickers SET owned = 0 WHERE code = ?`, [code]);
 }
 
 export function getStickerByCode(code: string) {

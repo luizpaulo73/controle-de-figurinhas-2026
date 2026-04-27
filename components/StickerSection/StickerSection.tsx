@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export type StickerSectionItem = {
     id: string;
@@ -13,9 +13,20 @@ type StickerSectionProps = {
     flagEmoji: string;
     groupName: string;
     stickers: StickerSectionItem[];
+    onAddSticker: (code: string) => void;
+    onRemoveSticker: (code: string) => void;
 };
 
-export default function StickerSection({ teamCode, countryName, countryRgb, flagEmoji, groupName, stickers }: StickerSectionProps) {
+export default function StickerSection({
+    teamCode,
+    countryName,
+    countryRgb,
+    flagEmoji,
+    groupName,
+    stickers,
+    onAddSticker,
+    onRemoveSticker,
+}: StickerSectionProps) {
     const totalStickers = stickers.length;
     const collectedCount = stickers.filter((item) => item.owned > 0).length;
     const progress = totalStickers > 0 ? (collectedCount / totalStickers) * 100 : 0;
@@ -48,16 +59,30 @@ export default function StickerSection({ teamCode, countryName, countryRgb, flag
                     const isCollected = item.owned > 0;
 
                     return (
-                        <View
+                        <Pressable
                             key={item.id}
-                            style={[styles.sticker, isCollected && styles.stickerCollected]}
+                            onPress={() => {
+                                if (isCollected) {
+                                    onRemoveSticker(item.code);
+                                    return;
+                                }
+
+                                onAddSticker(item.code);
+                            }}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Figurinha ${item.code}. Toque para ${isCollected ? "remover" : "adicionar"}.`}
+                            style={({ pressed }) => [
+                                styles.sticker,
+                                isCollected && styles.stickerCollected,
+                                pressed && styles.stickerPressed,
+                            ]}
                         >
                             <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>
                                 {item.code}
                             </Text>
 
                             {isCollected && <Text style={styles.check}>✓</Text>}
-                        </View>
+                        </Pressable>
                     );
                 })}
             </View>
@@ -151,8 +176,9 @@ const styles = StyleSheet.create({
         position: "relative",
         marginBottom: 10,
     },
-    stickerRepeated: {
-        borderColor: "#E59B1D",
+    stickerPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.98 }],
     },
     stickerCollected: {
         borderColor: "#2ABA57",
@@ -175,22 +201,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "900",
         lineHeight: 18,
-    },
-    badge: {
-        position: "absolute",
-        right: -6,
-        top: -8,
-        minWidth: 20,
-        height: 20,
-        borderRadius: 10,
-        paddingHorizontal: 4,
-        backgroundColor: "#E59B1D",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    badgeText: {
-        color: "#FFFFFF",
-        fontSize: 12,
-        fontWeight: "900",
     },
 });
