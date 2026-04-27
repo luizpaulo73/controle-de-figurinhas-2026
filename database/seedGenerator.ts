@@ -1,4 +1,5 @@
 import { groups } from "./albumStructure/groups";
+import { teamCountryMeta } from "./albumStructure/countries";
 
 type StickerSeed = {
     code: string;
@@ -6,6 +7,9 @@ type StickerSeed = {
     team_code: string | null;
     group: string | null;
     number: number;
+    country_name: string | null;
+    country_rgb: string | null;
+    flag_emoji: string | null;
 };
 
 export function generateStickerSeed(): StickerSeed[] {
@@ -18,6 +22,9 @@ export function generateStickerSeed(): StickerSeed[] {
         team_code: null,
         group: null,
         number: 0,
+        country_name: null,
+        country_rgb: null,
+        flag_emoji: null,
     });
 
     // panini FWC stickers (initial page)
@@ -28,6 +35,9 @@ export function generateStickerSeed(): StickerSeed[] {
             team_code: null,
             group: null,
             number: i,
+            country_name: null,
+            country_rgb: null,
+            flag_emoji: null,
         });
     }
 
@@ -39,12 +49,17 @@ export function generateStickerSeed(): StickerSeed[] {
             team_code: null,
             group: null,
             number: i,
+            country_name: null,
+            country_rgb: null,
+            flag_emoji: null,
         });
     }
 
     // countries (48 teams with 20 stickers each)
     groups.forEach((g) => {
         g.teams.forEach((team) => {
+            const countryMeta = teamCountryMeta[team];
+
             for (let i = 1; i <= 20; i++) {
                 stickers.push({
                     code: `${team}${i}`,
@@ -52,6 +67,9 @@ export function generateStickerSeed(): StickerSeed[] {
                     team_code: team,
                     group: g.group,
                     number: i,
+                    country_name: countryMeta?.name ?? team,
+                    country_rgb: countryMeta?.rgb ?? "rgb(10, 46, 111)",
+                    flag_emoji: countryMeta?.flagEmoji ?? "🏳️",
                 });
             }
         });
@@ -65,6 +83,9 @@ export function generateStickerSeed(): StickerSeed[] {
             team_code: null,
             group: null,
             number: i,
+            country_name: null,
+            country_rgb: null,
+            flag_emoji: null,
         });
     }
 
@@ -76,6 +97,9 @@ export function generateStickerSeed(): StickerSeed[] {
             team_code: null,
             group: null,
             number: i,
+            country_name: null,
+            country_rgb: null,
+            flag_emoji: null,
         });
     }
 
