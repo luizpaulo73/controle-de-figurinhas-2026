@@ -1,3 +1,4 @@
+import { AlbumTeamSection, TeamStickerRow } from "../types/sqlAlbum";
 import { db } from "./db";
 import { generateStickerSeed } from "./seedGenerator";
 
@@ -67,4 +68,53 @@ export function removeSticker(code: string) {
 
 export function getStickerByCode(code: string) {
     return db.getFirstSync(`SELECT * FROM stickers WHERE code = ?`, [code]);
+}
+
+export function getAlbumTeamSections(): AlbumTeamSection[] {
+    initDB();
+    seedStickers();
+
+    const rows = db.getAllSync<TeamStickerRow>(
+        `SELECT id, code, team_code, group_name, number, owned
+         FROM stickers
+         WHERE group_type = 'TEAM'
+         ORDER BY id ASC`
+    );
+
+    const sectionsByTeam = new Map<string, AlbumTeamSection>();
+
+    rows.forEach((row) => {
+        if (!row.team_code || !row.group_name) {
+            return;
+        }
+
+        const teamCode = row.team_code;
+        const existingSection = sectionsByTeam.get(teamCode);
+
+        if (existingSection) {
+            existingSection.stickers.push({
+                id: row.code,
+                code: row.code,
+                number: row.number,
+                owned: row.owned ?? 0,
+            });
+            return;
+        }
+
+        sectionsByTeam.set(teamCode, {
+            id: teamCode,
+            teamCode,
+            groupName: row.group_name,
+            stickers: [
+                {
+                    id: row.code,
+                    code: row.code,
+                    number: row.number,
+                    owned: row.owned ?? 0,
+                },
+            ],
+        });
+    });
+
+    return Array.from(sectionsByTeam.values());
 }
