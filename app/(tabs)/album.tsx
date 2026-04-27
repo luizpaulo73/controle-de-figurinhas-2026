@@ -31,6 +31,9 @@ export default function AlbumPage() {
                     <View style={styles.sectionItem}>
                         <StickerSection
                             teamCode={item.teamCode}
+                            countryName={item.countryName}
+                            countryRgb={item.countryRgb}
+                            flagEmoji={item.flagEmoji}
                             groupName={item.groupName}
                             stickers={item.stickers}
                         />
