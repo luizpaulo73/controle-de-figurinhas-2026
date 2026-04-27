@@ -1,102 +1,65 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-type StickerItem = {
+export type StickerSectionItem = {
     id: string;
     code: string;
-    repeated: number;
-    isCollected: boolean;
+    owned: number;
 };
 
-const TOTAL_STICKERS = 20;
-const REPEATED_BY_NUMBER: Record<number, number> = {
-    3: 2,
-    6: 3,
-    9: 3,
-    12: 5,
-    17: 5,
+type StickerSectionProps = {
+    teamCode: string;
+    groupName: string;
+    stickers: StickerSectionItem[];
 };
-const COLLECTED_ONLY = new Set([2, 7, 8, 14, 15, 16, 19, 20]);
 
-const MOCK_STICKERS: StickerItem[] = Array.from(
-    { length: TOTAL_STICKERS },
-    (_, index) => {
-        const stickerNumber = index + 1;
-        const repeated = REPEATED_BY_NUMBER[stickerNumber] ?? 0;
-
-        return {
-            id: `USA${stickerNumber}`,
-            code: `USA${stickerNumber}`,
-            repeated,
-            isCollected: repeated > 0 || COLLECTED_ONLY.has(stickerNumber),
-        };
-    },
-);
-
-export default function StickerSection() {
-    const collectedCount = MOCK_STICKERS.filter(
-        (item) => item.isCollected,
-    ).length;
-    const progress = (collectedCount / TOTAL_STICKERS) * 100;
+export default function StickerSection({ teamCode, groupName, stickers }: StickerSectionProps) {
+    const totalStickers = stickers.length;
+    const collectedCount = stickers.filter((item) => item.owned > 0).length;
+    const progress = totalStickers > 0 ? (collectedCount / totalStickers) * 100 : 0;
 
     return (
         <View style={styles.wrapper}>
             <View style={styles.header}>
                 <View style={styles.countryBlock}>
-                    <Text style={styles.countryCode}>USA</Text>
-                    <Text style={styles.countryName}>Estados Unidos</Text>
+                    <Text style={styles.countryCode}>{teamCode}</Text>
+                    <Text style={styles.countryName}>Grupo {groupName}</Text>
                 </View>
 
                 <View style={styles.progressBlock}>
                     <Text style={styles.progressText}>
-                        {collectedCount}/{TOTAL_STICKERS}
+                        {collectedCount}/{totalStickers}
                     </Text>
                     <View style={styles.progressTrack}>
-                        <View
-                            style={[
-                                styles.progressFill,
-                                { width: `${progress}%` },
-                            ]}
-                        />
+                        <View style={[styles.progressFill, { width: `${progress}%` }]} />
                     </View>
                 </View>
             </View>
 
-            <FlatList
-                data={MOCK_STICKERS}
-                keyExtractor={(item) => item.id}
-                numColumns={5}
-                scrollEnabled={false}
-                contentContainerStyle={styles.gridContent}
-                columnWrapperStyle={styles.gridRow}
-                renderItem={({ item }) => {
-                    const isRepeated = item.repeated > 0;
-                    const isCollected = item.isCollected && !isRepeated;
+            <View style={styles.gridContent}>
+                {stickers.map((item) => {
+                    const isCollected = item.owned > 0;
 
                     return (
-                        <View style={[styles.sticker, isCollected && styles.stickerCollected]}>
-                            <Text style={[styles.stickerText, !item.isCollected && styles.stickerTextMissing]}>
+                        <View
+                            key={item.id}
+                            style={[styles.sticker, isCollected && styles.stickerCollected]}
+                        >
+                            <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>
                                 {item.code}
                             </Text>
 
-                            {isRepeated &&
-                                <View style={styles.badge}>
-                                    <Text style={styles.badgeText}>
-                                        {item.repeated}
-                                    </Text>
-                                </View>
-                            }
+                            {isCollected && <Text style={styles.check}>✓</Text>}
                         </View>
                     );
-                }}
-            />
+                })}
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     wrapper: {
-        width: "92%",
-        maxWidth: 560,
+        width: "100%",
         backgroundColor: "#30302E",
         borderRadius: 14,
         borderWidth: 1,
@@ -109,7 +72,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingVertical: 8,
     },
     countryBlock: {
         flexDirection: "row",
@@ -132,9 +95,9 @@ const styles = StyleSheet.create({
     },
     progressText: {
         color: "#FFFFFF",
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: "900",
-        lineHeight: 30,
+        lineHeight: 20,
     },
     progressTrack: {
         marginTop: 4,
@@ -150,17 +113,16 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFFFFF",
     },
     gridContent: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
         paddingHorizontal: 12,
         paddingTop: 12,
         paddingBottom: 14,
     },
-    gridRow: {
-        justifyContent: "space-between",
-        marginBottom: 10,
-    },
     sticker: {
         width: "19%",
-        height: 46,
+        height: 35,
         borderRadius: 10,
         borderWidth: 2,
         borderColor: "#65645F",
@@ -168,6 +130,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
+        marginBottom: 10,
+    },
+    stickerRepeated: {
+        borderColor: "#E59B1D",
     },
     stickerCollected: {
         borderColor: "#2ABA57",
@@ -175,27 +141,37 @@ const styles = StyleSheet.create({
     },
     stickerText: {
         color: "#132A45",
-        fontSize: 17,
+        fontSize: 12,
         fontWeight: "800",
         letterSpacing: 0.2,
     },
     stickerTextMissing: {
         color: "#6D7480",
     },
+    check: {
+        position: "absolute",
+        right: 6,
+        bottom: 2,
+        color: "#2ABA57",
+        fontSize: 16,
+        fontWeight: "900",
+        lineHeight: 18,
+    },
     badge: {
         position: "absolute",
-        right: 0,
-        top: 0,
-        minWidth: 15,
-        height: 12,
-        borderTopRightRadius: 7,
+        right: -6,
+        top: -8,
+        minWidth: 20,
+        height: 20,
+        borderRadius: 10,
+        paddingHorizontal: 4,
         backgroundColor: "#E59B1D",
         alignItems: "center",
         justifyContent: "center",
     },
     badgeText: {
         color: "#FFFFFF",
-        fontSize: 9,
+        fontSize: 12,
         fontWeight: "900",
     },
 });
