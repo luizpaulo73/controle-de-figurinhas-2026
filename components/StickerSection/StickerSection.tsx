@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export type StickerSectionItem = {
@@ -27,13 +29,50 @@ export default function StickerSection({
     onAddSticker,
     onRemoveSticker,
 }: StickerSectionProps) {
+    const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+    const collapseStorageKey = `album:section-collapsed:${teamCode}`;
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadCollapsePreference = async () => {
+            try {
+                const value = await AsyncStorage.getItem(collapseStorageKey);
+
+                if (!isMounted || value === null) {
+                    return;
+                }
+
+                setIsCollapsed(value === "1");
+            } catch {}
+        };
+
+        loadCollapsePreference();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [collapseStorageKey]);
+
+    const handleToggleCollapse = () => {
+        const nextState = !isCollapsed;
+        setIsCollapsed(nextState);
+
+        AsyncStorage.setItem(collapseStorageKey, nextState ? "1" : "0").catch(() => {});
+    };
+
     const totalStickers = stickers.length;
     const collectedCount = stickers.filter((item) => item.owned > 0).length;
     const progress = totalStickers > 0 ? (collectedCount / totalStickers) * 100 : 0;
 
     return (
         <View style={styles.wrapper}>
-            <View style={[styles.header, { borderBottomColor: countryRgb, borderLeftColor: countryRgb }]}>
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Secao ${teamCode}. Toque para ${isCollapsed ? "expandir" : "recolher"}.`}
+                onPress={handleToggleCollapse}
+                style={[styles.header, { borderBottomColor: countryRgb, borderLeftColor: countryRgb }]}
+            >
                 <View style={styles.countryBlock}>
                     <Text style={styles.flagEmoji}>{flagEmoji}</Text>
 
@@ -43,49 +82,54 @@ export default function StickerSection({
                     </View>
                 </View>
 
-                <View style={styles.progressBlock}>
-                    <Text style={styles.groupText}>Grupo {groupName}</Text>
-                    <Text style={styles.progressText}>
-                        {collectedCount}/{totalStickers}
-                    </Text>
-                    <View style={styles.progressTrack}>
-                        <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={styles.progressBlock}>
+                        <Text style={styles.groupText}>Grupo {groupName}</Text>
+                        <Text style={styles.progressText}>
+                            {collectedCount}/{totalStickers}
+                        </Text>
+                        <View style={styles.progressTrack}>
+                            <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                        </View>
                     </View>
+                    <Text style={styles.collapseIcon}>{isCollapsed ? "+" : "-"}</Text>
                 </View>
-            </View>
+            </Pressable>
 
-            <View style={styles.gridContent}>
-                {stickers.map((item) => {
-                    const isCollected = item.owned > 0;
+            {!isCollapsed && (
+                <View style={styles.gridContent}>
+                    {stickers.map((item) => {
+                        const isCollected = item.owned > 0;
 
-                    return (
-                        <Pressable
-                            key={item.id}
-                            onPress={() => {
-                                if (isCollected) {
-                                    onRemoveSticker(item.code);
-                                    return;
-                                }
+                        return (
+                            <Pressable
+                                key={item.id}
+                                onPress={() => {
+                                    if (isCollected) {
+                                        onRemoveSticker(item.code);
+                                        return;
+                                    }
 
-                                onAddSticker(item.code);
-                            }}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Figurinha ${item.code}. Toque para ${isCollected ? "remover" : "adicionar"}.`}
-                            style={({ pressed }) => [
-                                styles.sticker,
-                                isCollected && styles.stickerCollected,
-                                pressed && styles.stickerPressed,
-                            ]}
-                        >
-                            <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>
-                                {item.code}
-                            </Text>
+                                    onAddSticker(item.code);
+                                }}
+                                accessibilityRole="button"
+                                accessibilityLabel={`Figurinha ${item.code}. Toque para ${isCollected ? "remover" : "adicionar"}.`}
+                                style={({ pressed }) => [
+                                    styles.sticker,
+                                    isCollected && styles.stickerCollected,
+                                    pressed && styles.stickerPressed,
+                                ]}
+                            >
+                                <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>
+                                    {item.code}
+                                </Text>
 
-                            {isCollected && <Text style={styles.check}>✓</Text>}
-                        </Pressable>
-                    );
-                })}
-            </View>
+                                {isCollected && <Text style={styles.check}>✓</Text>}
+                            </Pressable>
+                        );
+                    })}
+                </View>
+            )}
         </View>
     );
 }
@@ -127,6 +171,12 @@ const styles = StyleSheet.create({
         color: "#DDE6FA",
         fontSize: 12,
         fontWeight: "600",
+    },
+    collapseIcon: {
+        color: "#FFFFFF",
+        fontSize: 20,
+        fontWeight: "900",
+        marginLeft: 10,
     },
     progressBlock: {
         alignItems: "flex-end",
