@@ -125,9 +125,7 @@ export default function StickerSection({
                                     pressed && styles.stickerPressed,
                                 ]}
                             >
-                                <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>
-                                    {item.code}
-                                </Text>
+                                <Text style={[styles.stickerText, !isCollected && styles.stickerTextMissing]}>{item.code}</Text>
 
                                 {isCollected && <Text style={styles.check}>✓</Text>}
                             </Pressable>
@@ -214,7 +212,9 @@ const styles = StyleSheet.create({
     gridContent: {
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
+        columnGap: 4,
+        rowGap: 10,
         paddingHorizontal: 12,
         paddingTop: 12,
         paddingBottom: 14,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        marginBottom: 10,
+        marginBottom: 0,
     },
     stickerPressed: {
         opacity: 0.8,
