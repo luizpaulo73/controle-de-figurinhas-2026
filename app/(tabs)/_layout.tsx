@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
         borderRightWidth: 1,
         borderColor: "#65645F",
         height: 70,
-        paddingTop: 10,
+        paddingTop: 5,
     },
 });
