@@ -1,9 +1,5 @@
-import { View, Text } from "react-native";
+import { StickerScanner } from "../../components/StickerScanner/StickerScanner";
 
 export default function ScannerPage() {
-    return (
-        <View>
-            <Text>Em breve... (scanner)</Text>
-        </View>
-    );
+    return <StickerScanner />;
 }

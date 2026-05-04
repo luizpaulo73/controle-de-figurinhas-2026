@@ -141,6 +141,19 @@ export function getStickerByCode(code: string) {
     return db.getFirstSync(`SELECT * FROM stickers WHERE code = ?`, [code]);
 }
 
+export function compareStickerWithAlbum(code: string) {
+    const sticker = getStickerByCode(code) as
+        | { code?: string; owned?: number | null }
+        | undefined;
+
+    return {
+        code,
+        owned: sticker?.owned ?? 0,
+        isOwned: (sticker?.owned ?? 0) > 0,
+        exists: Boolean(sticker),
+    };
+}
+
 export function getAlbumTeamSections(): AlbumTeamSection[] {
     initDB();
     seedStickers();
