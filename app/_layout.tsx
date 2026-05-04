@@ -12,8 +12,12 @@ export default function RootLayout() {
 
     return (
         <View style={styles.root}>
-            <StatusBar style="light" backgroundColor="#262624" translucent={false} />
-            <Stack initialRouteName="(tabs)">
+            <StatusBar
+                style="light"
+                backgroundColor="#262624"
+                translucent={false}
+            />
+            <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
         </View>

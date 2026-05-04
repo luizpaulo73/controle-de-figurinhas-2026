@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "meuApp",
-    "slug": "meuApp",
+    "name": "Figurinhas 2026",
+    "slug": "figurinhas-2026",
     "scheme": "meuapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/world-cup.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/world-cup.png",
       "resizeMode": "contain",
       "backgroundColor": "#262624"
     },
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/world-cup.png",
         "backgroundColor": "#262624"
       },
       "edgeToEdgeEnabled": true,
@@ -30,7 +30,7 @@
       "translucent": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/world-cup.png"
     },
     "plugins": [
       "expo-router",
