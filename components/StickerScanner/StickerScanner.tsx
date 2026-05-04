@@ -8,6 +8,7 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
     Camera,
     runAtTargetFps,
@@ -41,6 +42,7 @@ export function StickerScanner() {
     const [feedbackMessage, setFeedbackMessage] = useState<string>(
         "Aponte a câmera para uma figurinha.",
     );
+    const [isCameraActive, setIsCameraActive] = useState(false);
     const blockedCodeRef = useRef<string | null>(null);
     const lastProcessedAt = useSharedValue(0);
     const [isDatabaseReady] = useState(() => {
@@ -48,6 +50,15 @@ export function StickerScanner() {
         seedStickers();
         return true;
     });
+
+    useFocusEffect(
+        useCallback(() => {
+            setIsCameraActive(true);
+            return () => {
+                setIsCameraActive(false);
+            };
+        }, []),
+    );
 
     const handleDetected = useCallback(
         (recognizedText: string) => {
@@ -165,29 +176,11 @@ export function StickerScanner() {
                 style={StyleSheet.absoluteFill}
                 device={device}
                 format={format}
-                isActive
+                isActive={isCameraActive}
                 frameProcessor={frameProcessor}
                 fps={30}
                 pixelFormat="yuv"
             />
-
-            {!isDatabaseReady ? null : (
-                <View
-                    style={[
-                        styles.guideArea,
-                        {
-                            width: Math.min(width * 0.76, 360),
-                            left: Math.max(
-                                (width - Math.min(width * 0.76, 360)) / 2,
-                                16,
-                            ),
-                            top: Math.max(height * 0.34, 96),
-                        },
-                    ]}
-                    pointerEvents="none"
-                />
-            )}
-
             <View style={styles.overlayPanel}>
                 <Text style={styles.overlayTitle}>Detectadas</Text>
                 <Text style={styles.feedbackText}>{feedbackMessage}</Text>

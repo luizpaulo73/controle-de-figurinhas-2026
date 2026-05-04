@@ -5,9 +5,11 @@ import {
     StyleSheet,
     ScrollView,
     RefreshControl,
+    Image,
 } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import Svg, { Circle } from "react-native-svg";
 import { useFocusEffect } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getProgressStats, ProgressStats } from "../../database/sql";
 
@@ -151,21 +153,34 @@ export default function ProgressPage() {
 
     if (!stats) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.loadingText}>Carregando...</Text>
-            </View>
+            <SafeAreaView style={styles.safeArea} edges={["top"]}>
+                <View style={styles.container}>
+                    <Text style={styles.loadingText}>Carregando...</Text>
+                </View>
+            </SafeAreaView>
         );
     }
 
     return (
-        <ScrollView
-            style={styles.container}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-        >
-            <View style={styles.header}>
-                <Text style={styles.title}>Progresso do Álbum</Text>
+        <SafeAreaView style={styles.safeArea} edges={["top"]}>
+            <ScrollView
+                style={styles.container}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+            <View style={styles.headerCard}>
+                <Image
+                    source={require("../../assets/world-cup.png")}
+                    style={styles.headerLogo}
+                    resizeMode="contain"
+                />
+
+                <View style={styles.headerTextBlock}>
+                    <Text style={styles.headerOverline}>PANINI</Text>
+                    <Text style={styles.headerTitle}>Copa do Mundo 2026</Text>
+                    <Text style={styles.headerSubtitle}>Figurinhas</Text>
+                </View>
             </View>
 
             {/* Gráfico de progresso geral */}
@@ -212,19 +227,57 @@ export default function ProgressPage() {
                     </View>
                 </View>
             </View>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#1B1B19",
+    },
     container: {
         flex: 1,
         backgroundColor: "#1B1B19",
     },
-    header: {
-        paddingHorizontal: 20,
-        paddingTop: 24,
-        paddingBottom: 12,
+    headerCard: {
+        marginTop: 4,
+        marginBottom: 10,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: "#65645F",
+        backgroundColor: "#30302E",
+        paddingHorizontal: 12,
+        marginHorizontal: 10,
+        paddingVertical: 10,
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    headerLogo: {
+        width: 72,
+        height: 72,
+        marginRight: 10,
+    },
+    headerTextBlock: {
+        flex: 1,
+    },
+    headerOverline: {
+        color: "#C9A85B",
+        fontSize: 10,
+        fontWeight: "800",
+        letterSpacing: 1,
+    },
+    headerTitle: {
+        color: "#FFFFFF",
+        fontSize: 22,
+        fontWeight: "900",
+        lineHeight: 26,
+    },
+    headerSubtitle: {
+        color: "#D7D4CA",
+        fontSize: 16,
+        fontWeight: "700",
     },
     title: {
         color: "#F6F5F2",
