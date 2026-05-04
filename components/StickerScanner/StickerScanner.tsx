@@ -16,8 +16,10 @@ import {
     useCameraFormat,
     useCameraPermission,
     useFrameProcessor,
+    CameraPosition,
 } from "react-native-vision-camera";
 import { useRunOnJS, useSharedValue } from "react-native-worklets-core";
+import { Zap, RotateCw } from "lucide-react-native";
 
 import {
     addSticker,
@@ -34,7 +36,10 @@ type DetectedSticker = {
 };
 
 export function StickerScanner() {
-    const device = useCameraDevice("back");
+    const [cameraPosition, setCameraPosition] =
+        useState<CameraPosition>("back");
+    const [torchEnabled, setTorchEnabled] = useState(false);
+    const device = useCameraDevice(cameraPosition);
     const format = useCameraFormat(device, [{ fps: 30 }]);
     const { hasPermission, requestPermission } = useCameraPermission();
     const [detectedSticker, setDetectedSticker] =
@@ -45,20 +50,24 @@ export function StickerScanner() {
     const [isCameraActive, setIsCameraActive] = useState(false);
     const blockedCodeRef = useRef<string | null>(null);
     const lastProcessedAt = useSharedValue(0);
-    const [isDatabaseReady] = useState(() => {
-        initDB();
-        seedStickers();
-        return true;
-    });
 
     useFocusEffect(
         useCallback(() => {
             setIsCameraActive(true);
             return () => {
                 setIsCameraActive(false);
+                setTorchEnabled(false);
             };
         }, []),
     );
+
+    const handleToggleFlash = useCallback(() => {
+        setTorchEnabled((prev) => !prev);
+    }, []);
+
+    const handleFlipCamera = useCallback(() => {
+        setCameraPosition((prev) => (prev === "back" ? "front" : "back"));
+    }, []);
 
     const handleDetected = useCallback(
         (recognizedText: string) => {
@@ -172,15 +181,49 @@ export function StickerScanner() {
 
     return (
         <View style={styles.container}>
-            <Camera
-                style={StyleSheet.absoluteFill}
-                device={device}
-                format={format}
-                isActive={isCameraActive}
-                frameProcessor={frameProcessor}
-                fps={30}
-                pixelFormat="yuv"
-            />
+            <View
+                style={[
+                    StyleSheet.absoluteFill,
+                    cameraPosition === "front" && {
+                        transform: [{ scaleX: -1 }],
+                    },
+                ]}
+            >
+                <Camera
+                    style={StyleSheet.absoluteFill}
+                    device={device}
+                    format={format}
+                    isActive={isCameraActive}
+                    frameProcessor={frameProcessor}
+                    fps={30}
+                    pixelFormat="yuv"
+                    torch={torchEnabled ? "on" : "off"}
+                />
+            </View>
+
+            {/* Botões de controle */}
+            <View style={styles.controlsContainer}>
+                <Pressable
+                    style={[
+                        styles.controlButton,
+                        torchEnabled && styles.controlButtonActive,
+                    ]}
+                    onPress={handleToggleFlash}
+                >
+                    <Zap
+                        size={24}
+                        color={torchEnabled ? "#FFD700" : "#FFFFFF"}
+                    />
+                </Pressable>
+
+                <Pressable
+                    style={styles.controlButton}
+                    onPress={handleFlipCamera}
+                >
+                    <RotateCw size={24} color="#FFFFFF" />
+                </Pressable>
+            </View>
+
             <View style={styles.overlayPanel}>
                 <Text style={styles.overlayTitle}>Detectadas</Text>
                 <Text style={styles.feedbackText}>{feedbackMessage}</Text>
@@ -275,6 +318,28 @@ const styles = StyleSheet.create({
         color: "#1F1E1A",
         fontWeight: "700",
         fontSize: 14,
+    },
+    controlsContainer: {
+        position: "absolute",
+        top: 16,
+        right: 16,
+        paddingTop: 20,
+        gap: 12,
+        zIndex: 10,
+    },
+    controlButton: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 1,
+        borderColor: "rgba(255, 255, 255, 0.2)",
+    },
+    controlButtonActive: {
+        backgroundColor: "rgba(255, 215, 0, 0.2)",
+        borderColor: "rgba(255, 215, 0, 0.5)",
     },
     guideArea: {
         position: "absolute",
