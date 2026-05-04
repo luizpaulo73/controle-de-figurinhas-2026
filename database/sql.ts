@@ -241,3 +241,70 @@ export function getAlbumTeamSections(): AlbumTeamSection[] {
 
     return [specialSection, ...teamSections];
 }
+
+export type ProgressStats = {
+    total: number;
+    collected: number;
+    percentage: number;
+    byType: {
+        type: "INTRO" | "HOST" | "TEAM" | "FWC" | "COCA";
+        total: number;
+        collected: number;
+        percentage: number;
+    }[];
+};
+
+export function getProgressStats(): ProgressStats {
+    initDB();
+    seedStickers();
+
+    // Total geral
+    const allStats = db.getFirstSync<{ total: number; collected: number }>(
+        `SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN owned = 1 THEN 1 ELSE 0 END) as collected
+         FROM stickers`,
+    ) || { total: 0, collected: 0 };
+
+    const totalCollected = allStats.collected || 0;
+    const totalStickers = allStats.total || 1;
+
+    // Por tipo
+    const byTypeRows = db.getAllSync<{
+        group_type: string;
+        total: number;
+        collected: number;
+    }>(
+        `SELECT 
+            group_type,
+            COUNT(*) as total,
+            SUM(CASE WHEN owned = 1 THEN 1 ELSE 0 END) as collected
+         FROM stickers
+         GROUP BY group_type
+         ORDER BY group_type ASC`,
+    );
+
+    const byType = byTypeRows
+        .map((row) => ({
+            type:
+                (row.group_type as
+                    | "INTRO"
+                    | "HOST"
+                    | "TEAM"
+                    | "FWC"
+                    | "COCA") || "TEAM",
+            total: row.total || 0,
+            collected: row.collected || 0,
+            percentage:
+                row.total > 0 ? ((row.collected || 0) / row.total) * 100 : 0,
+        }))
+        .filter((item) => item.total > 0);
+
+    return {
+        total: totalStickers,
+        collected: totalCollected,
+        percentage:
+            totalStickers > 0 ? (totalCollected / totalStickers) * 100 : 0,
+        byType,
+    };
+}
